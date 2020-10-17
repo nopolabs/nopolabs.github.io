@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+
+<head>
+  <link rel="stylesheet"
+        class="codestyle"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/styles/default.min.css"
+        integrity="sha512-kZqGbhf9JTB4bVJ0G8HCkqmaPcRgo88F0dneK30yku5Y/dep7CZfCnNml2Je/sY4lBoqoksXz4PtVXS4GHSUzQ=="
+        crossorigin="anonymous" />
+  <link rel="stylesheet"
+        class="codestyle"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/styles/solarized-dark.min.css"
+        integrity="sha512-H+WY7zsI0kQwkbYE+yp/9vg/UzpiyuKERzpxOaGwKCc7iFoNpi0h3mQ4GpZMO9lDaVzc1xjD3e6g/UMuUlOicg=="
+        crossorigin="anonymous" />
+  <link rel="stylesheet"
+        class="codestyle"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/styles/darcula.min.css"
+        integrity="sha512-0+Gq7jQLhuoMdL8EednGo8delKMhKim1t3XrvVGTqbJPfyv5f4HUJ0DTEN+3E+aM4RGEEfmVJOiomnP9olm4iw=="
+        crossorigin="anonymous" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/highlight.min.js"
+          integrity="sha512-Ypjm0o7jOxAd4hpdoppSEN0TQOC19UtPAqD+4s5AlXmUvbmmS/YMxYqAqarQYyxTnB6/rqip9qcxlNB/3U9Wdg=="
+          crossorigin="anonymous"></script>
+
+  <script>
+    function getLanguages() {
+      return hljs.listLanguages();
+    }
+
+    function getStyles() {
+      const styles = [];
+      for (let link of document.querySelectorAll('.codestyle')) {
+        let match = link.href.match(`\/([^/]*)\.min\.css$`);
+        if (match) {
+          styles.push(match[1]);
+        }
+      }
+      return styles;
+    }
+
+    function getLanguage() {
+      return document.getElementById('languages').selectedOptions[0].value;
+    }
+
+    function getStyle() {
+      return document.getElementById('styles').selectedOptions[0].value;
+    }
+
+    function addOptions(select, options) {
+      options.forEach(function(option) {
+        const el = document.createElement("option");
+        el.text = option;
+        el.value = option;
+        select.add(el);
+      });
+    }
+
+    function enableStyle(style) {
+      for (let link of document.querySelectorAll('.codestyle')) {
+        link.disabled = !link.href.match(`\/${style}\.min\.css$`);
+      }
+    }
+
+    function format() {
+      const input = document.getElementById('input');
+      const output = document.getElementById('output');
+      const preview = document.getElementById('preview');
+      const language = getLanguage();
+      const style = getStyle();
+
+      const highlighted = hljs.highlight(language, input.value);
+
+      output.value = `<pre><code class="hljs ${language}">${highlighted.value}</code></pre>`;
+
+      preview.innerHTML = highlighted.value;
+      preview.className = `hljs ${language}`;
+
+      enableStyle(style);
+    }
+
+    function copyHtmlToClipboard() {
+      const output = document.getElementById('output');
+      navigator.clipboard.writeText(output.value);
+    }
+
+    function copyLinkToClipboard() {
+      for (let link of document.querySelectorAll('.codestyle')) {
+        if (!link.disabled) {
+          navigator.clipboard.writeText(link.outerHTML);
+        }
+      }
+    }
+
+    function init() {
+      const form = document.getElementById('form');
+      const formatButton = document.getElementById('format');
+      const copyHtmlButton = document.getElementById('copyHtml');
+      const copyLinkButton = document.getElementById('copyLink');
+      const selectLanguages = document.getElementById('languages');
+      const selectStyles = document.getElementById('styles');
+
+      form.onsubmit = ev => ev.preventDefault();
+      formatButton.addEventListener("click", format)
+      copyHtmlButton.addEventListener("click", copyHtmlToClipboard)
+      copyLinkButton.addEventListener("click", copyLinkToClipboard)
+      addOptions(selectLanguages, getLanguages());
+      addOptions(selectStyles, getStyles());
+    }
+
+    window.onload = init;
+  </script>
+
+  <title>Highlight</title>
+</head>
+
+<body>
+
+<p>
+  This page uses <a href="https://highlightjs.org">highlight.js</a>
+  to format code to html with syntax highlighting.
+</p>
+<p>
+  If you have a webpage that can execute javascript, either in the browser or on the server
+  it is possible to use highlight.js directly, see <a href="https://highlightjs.org/usage/">usage</a>.
+</p>
+<p>
+  The problem this page tries to solve is: how to display code with syntax highlighting
+  on a static web page, using only html and css.
+</p>
+<form id="form">
+  <p>
+    <label><textarea id="input" cols="80" rows="10"></textarea></label>
+  </p>
+  <p>
+    <label><select id="languages"></select></label>
+    <label><select id="styles"></select></label>
+    <button id="format">format</button>
+  </p>
+  <p>
+    <label><textarea id="output" cols="80" rows="10"></textarea></label>
+  </p>
+  <p>
+    <button id="copyHtml">Copy HTML</button>
+    <button id="copyLink">Copy Link</button>
+  </p>
+</form>
+
+<div>
+  <pre><code id="preview"></code></pre>
+</div>
+
+</body>
+
+</html>
