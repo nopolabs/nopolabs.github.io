@@ -1,40 +1,39 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
-  <link rel="stylesheet"
-        class="codestyle"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/styles/default.min.css"
-        integrity="sha512-kZqGbhf9JTB4bVJ0G8HCkqmaPcRgo88F0dneK30yku5Y/dep7CZfCnNml2Je/sY4lBoqoksXz4PtVXS4GHSUzQ=="
-        crossorigin="anonymous" />
-  <link rel="stylesheet"
-        class="codestyle"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/styles/solarized-dark.min.css"
-        integrity="sha512-H+WY7zsI0kQwkbYE+yp/9vg/UzpiyuKERzpxOaGwKCc7iFoNpi0h3mQ4GpZMO9lDaVzc1xjD3e6g/UMuUlOicg=="
-        crossorigin="anonymous" />
-  <link rel="stylesheet"
-        class="codestyle"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/styles/darcula.min.css"
-        integrity="sha512-0+Gq7jQLhuoMdL8EednGo8delKMhKim1t3XrvVGTqbJPfyv5f4HUJ0DTEN+3E+aM4RGEEfmVJOiomnP9olm4iw=="
-        crossorigin="anonymous" />
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.1/highlight.min.js"
-          integrity="sha512-Ypjm0o7jOxAd4hpdoppSEN0TQOC19UtPAqD+4s5AlXmUvbmmS/YMxYqAqarQYyxTnB6/rqip9qcxlNB/3U9Wdg=="
-          crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.0/styles/default.min.css" integrity="sha512-kZqGbhf9JTB4bVJ0G8HCkqmaPcRgo88F0dneK30yku5Y/dep7CZfCnNml2Je/sY4lBoqoksXz4PtVXS4GHSUzQ==" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.0/styles/darcula.min.css" integrity="sha512-0+Gq7jQLhuoMdL8EednGo8delKMhKim1t3XrvVGTqbJPfyv5f4HUJ0DTEN+3E+aM4RGEEfmVJOiomnP9olm4iw==" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.0/styles/solarized-dark.min.css" integrity="sha512-H+WY7zsI0kQwkbYE+yp/9vg/UzpiyuKERzpxOaGwKCc7iFoNpi0h3mQ4GpZMO9lDaVzc1xjD3e6g/UMuUlOicg==" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.0/styles/solarized-light.min.css" integrity="sha512-pJ4snSRt1JFJy6nAJ+zop0G55rCzd1qtW0CvOvB1XGTopUBHSwIZ2qn3g2ztlPfrCaudkpXVcN2BK+ZdxCJ6pQ==" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.0/styles/school-book.min.css" integrity="sha512-pNxggVQburoTfUfcIoJyQf1jfJB603w7k++O+sDW7gqw1kCPU3dFJUBT3SfYKWt7Q2pagqulXjnxY6ETFEg+yQ==" crossorigin="anonymous" />
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.0/highlight.min.js" integrity="sha512-l+FOEBNX5sD6XUd8O9Bnw5OGiLNSB5cMH6VNZFsKug/4Lj+6rBosKptmjNudG9vjtsNZYyy7+yoOJgtdKZ03pg==" crossorigin="anonymous"></script>
 
   <script>
+    function getHighlightStyleLinks() {
+      const links = document.querySelectorAll("link");
+      const highlightStyleLinks = [];
+      for (let i = 0; i < links.length; i++) {
+        if (links[i].href.match(`\/highlight\.js\/.*\/styles\/.*\.min\.css$`)) {
+          highlightStyleLinks.push(links[i]);
+        }
+      }
+      return highlightStyleLinks;
+    }
+
     function getLanguages() {
       return hljs.listLanguages();
     }
 
     function getStyles() {
       const styles = [];
-      for (let link of document.querySelectorAll('.codestyle')) {
-        let match = link.href.match(`\/([^/]*)\.min\.css$`);
+      getHighlightStyleLinks().forEach(function (link) {
+        const match = link.href.match(`\/([^/]*)\.min\.css$`);
         if (match) {
           styles.push(match[1]);
         }
-      }
+      });
       return styles;
     }
 
@@ -46,19 +45,20 @@
       return document.getElementById('styles').selectedOptions[0].value;
     }
 
-    function addOptions(select, options) {
+    function addOptions(select, options, selectedOption) {
       options.forEach(function(option) {
         const el = document.createElement("option");
         el.text = option;
         el.value = option;
+        el.selected = (option === selectedOption);
         select.add(el);
       });
     }
 
     function enableStyle(style) {
-      for (let link of document.querySelectorAll('.codestyle')) {
+      getHighlightStyleLinks().forEach(function (link) {
         link.disabled = !link.href.match(`\/${style}\.min\.css$`);
-      }
+      })
     }
 
     function format() {
@@ -84,16 +84,30 @@
     }
 
     function copyLinkToClipboard() {
-      for (let link of document.querySelectorAll('.codestyle')) {
+      getHighlightStyleLinks().forEach(function (link) {
         if (!link.disabled) {
           navigator.clipboard.writeText(link.outerHTML);
         }
-      }
+      })
+    }
+
+    function showHtml() {
+      document.getElementById('showHtml').hidden = true;
+      document.getElementById('hideHtml').hidden = false;
+      document.getElementById('output').hidden = false;
+    }
+
+    function hideHtml() {
+      document.getElementById('showHtml').hidden = false;
+      document.getElementById('hideHtml').hidden = true;
+      document.getElementById('output').hidden = true;
     }
 
     function init() {
       const form = document.getElementById('form');
       const formatButton = document.getElementById('format');
+      const showHtmlButton = document.getElementById('showHtml');
+      const hideHtmlButton = document.getElementById('hideHtml');
       const copyHtmlButton = document.getElementById('copyHtml');
       const copyLinkButton = document.getElementById('copyLink');
       const selectLanguages = document.getElementById('languages');
@@ -101,10 +115,14 @@
 
       form.onsubmit = ev => ev.preventDefault();
       formatButton.addEventListener("click", format)
+      showHtmlButton.addEventListener("click", showHtml)
+      hideHtmlButton.addEventListener("click", hideHtml)
       copyHtmlButton.addEventListener("click", copyHtmlToClipboard)
       copyLinkButton.addEventListener("click", copyLinkToClipboard)
-      addOptions(selectLanguages, getLanguages());
-      addOptions(selectStyles, getStyles());
+      addOptions(selectLanguages, getLanguages(), "javascript");
+      addOptions(selectStyles, getStyles(), "solarized-dark");
+
+      hideHtml();
     }
 
     window.onload = init;
@@ -137,14 +155,15 @@
     <button id="format">format</button>
   </p>
   <p>
-    <label><textarea id="output" cols="80" rows="10"></textarea></label>
-  </p>
-  <p>
+    <button id="showHtml">Show HTML</button>
+    <button id="hideHtml">Hide HTML</button>
     <button id="copyHtml">Copy HTML</button>
     <button id="copyLink">Copy Link</button>
   </p>
+  <p>
+    <label><textarea id="output" cols="80" rows="10"></textarea></label>
+  </p>
 </form>
-
 <div>
   <pre><code id="preview"></code></pre>
 </div>
