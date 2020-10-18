@@ -58,7 +58,7 @@
     function enableStyle(style) {
       getHighlightStyleLinks().forEach(function (link) {
         link.disabled = !link.href.match(`\/${style}\.min\.css$`);
-      })
+      });
     }
 
     function format() {
@@ -88,26 +88,26 @@
         if (!link.disabled) {
           navigator.clipboard.writeText(link.outerHTML);
         }
-      })
+      });
     }
 
-    function showHtml() {
-      document.getElementById('showHtml').hidden = true;
-      document.getElementById('hideHtml').hidden = false;
-      document.getElementById('output').hidden = false;
-    }
-
-    function hideHtml() {
-      document.getElementById('showHtml').hidden = false;
-      document.getElementById('hideHtml').hidden = true;
-      document.getElementById('output').hidden = true;
+    function copyHtmlWithStyleToClipboard() {
+      const output = document.getElementById('output');
+      const html = output.value;
+      getHighlightStyleLinks().forEach(function (link) {
+        if (!link.disabled) {
+          fetch(link.href)
+                  .then(response => response.text())
+                  .then(css => `<style>/* ${link.href} */ ${css}</style>${html}`)
+                  .then(htmlWithStyle => navigator.clipboard.writeText(htmlWithStyle));
+        }
+      });
     }
 
     function init() {
       const form = document.getElementById('form');
       const formatButton = document.getElementById('format');
-      const showHtmlButton = document.getElementById('showHtml');
-      const hideHtmlButton = document.getElementById('hideHtml');
+      const copyHtmlWithStyleButton = document.getElementById('copyHtmlWithStyle');
       const copyHtmlButton = document.getElementById('copyHtml');
       const copyLinkButton = document.getElementById('copyLink');
       const selectLanguages = document.getElementById('languages');
@@ -115,14 +115,11 @@
 
       form.onsubmit = ev => ev.preventDefault();
       formatButton.addEventListener("click", format)
-      showHtmlButton.addEventListener("click", showHtml)
-      hideHtmlButton.addEventListener("click", hideHtml)
+      copyHtmlWithStyleButton.addEventListener("click", copyHtmlWithStyleToClipboard)
       copyHtmlButton.addEventListener("click", copyHtmlToClipboard)
       copyLinkButton.addEventListener("click", copyLinkToClipboard)
       addOptions(selectLanguages, getLanguages(), "javascript");
       addOptions(selectStyles, getStyles(), "solarized-dark");
-
-      hideHtml();
     }
 
     window.onload = init;
@@ -155,13 +152,12 @@
     <button id="format">format</button>
   </p>
   <p>
-    <button id="showHtml">Show HTML</button>
-    <button id="hideHtml">Hide HTML</button>
+    <button id="copyHtmlWithStyle">Copy HTML w/&lt;style&gt;</button>
     <button id="copyHtml">Copy HTML</button>
     <button id="copyLink">Copy Link</button>
   </p>
   <p>
-    <label><textarea id="output" cols="80" rows="10"></textarea></label>
+    <label><textarea hidden id="output" cols="80" rows="10"></textarea></label>
   </p>
 </form>
 <div>
